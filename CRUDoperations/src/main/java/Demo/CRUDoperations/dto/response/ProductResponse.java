@@ -4,7 +4,7 @@ import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.dto.request.ProductRequest;
 
 public class ProductResponse extends ProductRequest {
-    public int id;
+    int id;
     public ProductResponse(){
         super();
     }
@@ -13,6 +13,6 @@ public class ProductResponse extends ProductRequest {
         this.name= save.getName();
         this.price= save.getPrice();
         this.tax= save.getTax();
-        //this.status=save.getStatus();
+        this.status=save.getStatus();
     }
 }

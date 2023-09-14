@@ -15,5 +15,7 @@ public class ExceptionHandlers {
     public String noData(Exception e) {
         return "id doesn't exists";
     }
+
+
 }
 

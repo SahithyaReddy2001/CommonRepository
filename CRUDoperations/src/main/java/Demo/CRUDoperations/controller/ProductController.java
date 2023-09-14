@@ -1,5 +1,6 @@
 package Demo.CRUDoperations.controller;
 
+import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.ProductRequest;
 import Demo.CRUDoperations.dto.response.ProductResponse;
 import Demo.CRUDoperations.service.ProductService;
@@ -18,13 +19,13 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getProducts() {
-        return  ResponseEntity.status(HttpStatus.OK).body(productService.getProducts());
+    public ApiResponse<List<ProductResponse>> getProducts() {
+        return  productService.getProducts();
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<ProductResponse> getPaticularProduct(@PathVariable int id) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getProduct(id));
+    public ApiResponse getPaticularProduct(@PathVariable int id) {
+        return productService.getProduct(id);
     }
 
     @PostMapping
@@ -33,9 +34,9 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<List<ProductResponse>> deleteProduct(@PathVariable int id) {
+    public ApiResponse<List<ProductResponse>> deleteProduct(@PathVariable int id) {
         productService.deleteProduct(id);
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getProducts());
+        return productService.getProducts();
     }
 
     @PutMapping(value = "/{id}")

@@ -5,7 +5,7 @@ import javax.persistence.*;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String name;
     float price;
@@ -22,11 +22,11 @@ public class Product {
         this.status = status;
     }
 
-    public Product(String name, float price, float tax) {
+    public Product(String name, float price, float tax,Status status) {
         this.name = name;
         this.price = price;
         this.tax = tax;
-        //this.status=status;
+        this.status=status;
     }
 
     @Override

@@ -1,21 +1,23 @@
 package Demo.CRUDoperations.dto.request;
 
 
+import Demo.CRUDoperations.entity.Status;
+
 public class ProductRequest {
     //public  Status status;
     public String name;
     public Float price;
     public Float tax;
-
+    public Status status;
     public ProductRequest(){
 
     }
 
-    public ProductRequest(String name, Float price, Float tax) {
+    public ProductRequest(String name, Float price, Float tax,Status status) {
         this.name = name;
         this.price = price;
         this.tax = tax;
-        //this.status=status;
+        this.status=status;
     }
 
     public String getName() {
@@ -42,12 +44,22 @@ public class ProductRequest {
         this.tax = tax;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     @Override
     public String toString() {
         return "ProductRequest{" +
                 "name='" + name + '\'' +
                 ", price=" + price +
                 ", tax=" + tax +
+                ", status=" + status +
                 '}';
     }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
 }

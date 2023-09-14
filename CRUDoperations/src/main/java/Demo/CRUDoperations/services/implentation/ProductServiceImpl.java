@@ -1,49 +1,67 @@
-package Demo.CRUDoperations.services;
+package Demo.CRUDoperations.services.implentation;
 
-import Demo.CRUDoperations.Entities.Product;
+import Demo.CRUDoperations.model.Entities.Product;
+import Demo.CRUDoperations.model.Entities.dto.request.ProductRequest;
+import Demo.CRUDoperations.model.Entities.dto.response.ProductResponse;
 import Demo.CRUDoperations.repositotries.ProductRepository;
+import Demo.CRUDoperations.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductRepository productRepository;
-    public List<Product> getProducts(){
-        return productRepository.findAll();
+    public List<ProductResponse> getProducts(){
+       List<Product> products= productRepository.findAll();
+       List<ProductResponse> productResponses=new ArrayList<>();
+       for(Product p:products){
+           productResponses.add(new ProductResponse(p));
+       }
+       return productResponses;
     }
-    public Product createProduct(Product product){
-        return productRepository.save(product);
+    public ProductResponse createProduct(ProductRequest productRequest){
+
+        Product product=createEntity(productRequest);
+       return new ProductResponse(productRepository.save(product));
     }
 
     public void deleteProduct(int id){
-        productRepository.deleteById(id);
+        deleteProducts(id);
+        //productRepository.deleteById(id);
     }
 
-    public Product updateProcuct(int id,Product product) {
-        Optional<Product> optional = productRepository.findById(id);
-        Product existingProduct;
-        if (optional.isPresent()) {
-            existingProduct = optional.get();
-            existingProduct.setName(product.getName());
-            existingProduct.setPrice(product.getPrice());
-            existingProduct.setTax(product.getTax());
-            productRepository.save(product);
+    private void deleteProducts(int id) {
+        Product product=productRepository.findById(id).get();
+    }
+
+    public ProductResponse updateProduct(int id,ProductRequest productRequest) {
+        Product product=updateEntity(productRequest,id);
+        return new ProductResponse(product);
+    }
+
+    public ProductResponse getProduct(int id) {
+
+         return new ProductResponse(productRepository.findById(id).get());
+
+    }
+    private Product createEntity(ProductRequest productRequest){
+        return  new Product(productRequest.name,productRequest.price,productRequest.tax,productRequest.status
+        );
+    }
+
+    private Product updateEntity(ProductRequest productRequest,int id) {
+        Product existingProduct = productRepository.findById(id).get();
+            existingProduct.setName(productRequest.getName());
+            existingProduct.setPrice(productRequest.getPrice());
+            existingProduct.setTax(productRequest.getTax());
+            productRepository.save(existingProduct);
             return existingProduct;
-        }
-        return null;
-    }
 
-    public Product getProduct(int id) {
-        //Optional<Product> optionalProduct=
-         return productRepository.findById(id).get();
-        /*if(optionalProduct.isPresent())
-            return optionalProduct.get();
-        else{
-            //ResponseEntity.status(404).body("Id doesn't exist");
-            return null;}*/
     }
 }

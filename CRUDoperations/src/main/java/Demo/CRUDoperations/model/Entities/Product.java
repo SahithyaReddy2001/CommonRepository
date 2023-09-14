@@ -1,21 +1,54 @@
-package Demo.CRUDoperations.Entities;
+package Demo.CRUDoperations.model.Entities;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
     String name;
     float price;
     float tax;
+    @Enumerated(EnumType.STRING)
+    Status status;
     public Product(){}
+
+    public Product(int id, String name, float price, float tax, Status status) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.tax = tax;
+        this.status = status;
+    }
+
+    public Product(String name, float price, float tax, Status status) {
+        this.name = name;
+        this.price = price;
+        this.tax = tax;
+        this.status=status;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", tax=" + tax +
+                ", status=" + status +
+                '}';
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     public int getId() {
         return id;
@@ -41,22 +74,6 @@ public class Product {
         this.price = price;
     }
 
-    public Product(int id, String name, float price, float tax) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.tax = tax;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", tax=" + tax +
-                '}';
-    }
 
     public float getTax() {
         return tax;

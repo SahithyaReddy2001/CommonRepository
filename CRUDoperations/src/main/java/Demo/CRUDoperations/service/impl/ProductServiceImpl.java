@@ -1,17 +1,15 @@
-package Demo.CRUDoperations.services.implentation;
+package Demo.CRUDoperations.service.impl;
 
-import Demo.CRUDoperations.model.Entities.Product;
-import Demo.CRUDoperations.model.Entities.dto.request.ProductRequest;
-import Demo.CRUDoperations.model.Entities.dto.response.ProductResponse;
-import Demo.CRUDoperations.repositotries.ProductRepository;
-import Demo.CRUDoperations.services.ProductService;
+import Demo.CRUDoperations.entity.Product;
+import Demo.CRUDoperations.dto.request.ProductRequest;
+import Demo.CRUDoperations.dto.response.ProductResponse;
+import Demo.CRUDoperations.repository.ProductRepository;
+import Demo.CRUDoperations.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -51,8 +49,7 @@ public class ProductServiceImpl implements ProductService {
 
     }
     private Product createEntity(ProductRequest productRequest){
-        return  new Product(productRequest.name,productRequest.price,productRequest.tax,productRequest.status
-        );
+        return  new Product(productRequest.name,productRequest.price,productRequest.tax);
     }
 
     private Product updateEntity(ProductRequest productRequest,int id) {

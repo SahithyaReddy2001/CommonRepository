@@ -1,6 +1,6 @@
 package Demo.CRUDoperations.controller;
 
-import Demo.CRUDoperations.model.entity.Orders;
+import Demo.CRUDoperations.entity.Orders;
 import Demo.CRUDoperations.service.OrderServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,12 +10,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
-public class ordersController{
+public class OrderController {
     @Autowired
     OrderServices orderServiceImps;
 
     @PostMapping
-    public ResponseEntity<Orders> saveOrders(@RequestBody Orders orders){
+    public ResponseEntity<Demo.CRUDoperations.entity.Orders> saveOrders(@RequestBody Orders orders){
         return  orderServiceImps.createOrders(orders);
     }
 
@@ -25,7 +25,7 @@ public class ordersController{
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Orders> getOrders(@PathVariable int id) {
+    public ResponseEntity<Demo.CRUDoperations.entity.Orders> getOrders(@PathVariable int id) {
         return orderServiceImps.getAllOrders(id);
     }
 

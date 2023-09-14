@@ -1,15 +1,14 @@
-package Demo.CRUDoperations.controllers;
+package Demo.CRUDoperations.controller;
 
-import Demo.CRUDoperations.model.Entities.dto.request.ProductRequest;
-import Demo.CRUDoperations.model.Entities.dto.response.ProductResponse;
-import Demo.CRUDoperations.services.ProductService;
+import Demo.CRUDoperations.dto.request.ProductRequest;
+import Demo.CRUDoperations.dto.response.ProductResponse;
+import Demo.CRUDoperations.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/products")

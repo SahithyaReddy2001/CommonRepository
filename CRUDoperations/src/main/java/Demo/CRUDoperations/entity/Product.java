@@ -1,6 +1,4 @@
-package Demo.CRUDoperations.model.Entities;
-
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+package Demo.CRUDoperations.entity;
 
 import javax.persistence.*;
 
@@ -24,11 +22,11 @@ public class Product {
         this.status = status;
     }
 
-    public Product(String name, float price, float tax, Status status) {
+    public Product(String name, float price, float tax) {
         this.name = name;
         this.price = price;
         this.tax = tax;
-        this.status=status;
+        //this.status=status;
     }
 
     @Override

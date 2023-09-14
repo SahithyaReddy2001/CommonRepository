@@ -1,8 +1,7 @@
-package Demo.CRUDoperations.services;
+package Demo.CRUDoperations.service;
 
-import Demo.CRUDoperations.model.Entities.Product;
-import Demo.CRUDoperations.model.Entities.dto.request.ProductRequest;
-import Demo.CRUDoperations.model.Entities.dto.response.ProductResponse;
+import Demo.CRUDoperations.dto.request.ProductRequest;
+import Demo.CRUDoperations.dto.response.ProductResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

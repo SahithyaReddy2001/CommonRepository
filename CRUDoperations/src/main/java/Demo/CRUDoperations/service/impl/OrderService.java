@@ -1,7 +1,8 @@
-package Demo.CRUDoperations.service;
+package Demo.CRUDoperations.service.impl;
 
 import Demo.CRUDoperations.entity.Orders;
 import Demo.CRUDoperations.repository.OrdersRepository;
+import Demo.CRUDoperations.service.OrderServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OrderService {
+public class OrderService implements OrderServices {
     @Autowired
     OrdersRepository ordersRepository;
 

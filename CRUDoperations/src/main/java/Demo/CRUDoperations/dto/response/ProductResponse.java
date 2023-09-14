@@ -1,7 +1,7 @@
-package Demo.CRUDoperations.model.Entities.dto.response;
+package Demo.CRUDoperations.dto.response;
 
-import Demo.CRUDoperations.model.Entities.Product;
-import Demo.CRUDoperations.model.Entities.dto.request.ProductRequest;
+import Demo.CRUDoperations.entity.Product;
+import Demo.CRUDoperations.dto.request.ProductRequest;
 
 public class ProductResponse extends ProductRequest {
     public int id;
@@ -13,6 +13,6 @@ public class ProductResponse extends ProductRequest {
         this.name= save.getName();
         this.price= save.getPrice();
         this.tax= save.getTax();
-        this.status=save.getStatus();
+        //this.status=save.getStatus();
     }
 }

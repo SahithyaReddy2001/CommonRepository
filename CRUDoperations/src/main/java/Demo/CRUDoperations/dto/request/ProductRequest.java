@@ -1,12 +1,8 @@
-package Demo.CRUDoperations.model.Entities.dto.request;
-
-import Demo.CRUDoperations.model.Entities.Product;
-import Demo.CRUDoperations.model.Entities.Status;
-import org.springframework.stereotype.Component;
+package Demo.CRUDoperations.dto.request;
 
 
 public class ProductRequest {
-    public  Status status;
+    //public  Status status;
     public String name;
     public Float price;
     public Float tax;
@@ -15,11 +11,11 @@ public class ProductRequest {
 
     }
 
-    public ProductRequest(String name, Float price, Float tax,Status status) {
+    public ProductRequest(String name, Float price, Float tax) {
         this.name = name;
         this.price = price;
         this.tax = tax;
-        this.status=status;
+        //this.status=status;
     }
 
     public String getName() {

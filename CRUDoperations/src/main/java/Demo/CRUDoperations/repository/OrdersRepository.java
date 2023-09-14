@@ -1,4 +1,4 @@
-package Demo.CRUDoperations.repositories;
+package Demo.CRUDoperations.repository;
 
 import Demo.CRUDoperations.entity.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
-package Demo.CRUDoperations.repositotries;
+package Demo.CRUDoperations.repository;
 
-import Demo.CRUDoperations.model.Entities.Product;
+import Demo.CRUDoperations.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

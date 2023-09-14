@@ -1,25 +1,34 @@
-package Demo.CRUDoperations.dto.request;
+package Demo.CRUDoperations.apiresponse;
 
 import Demo.CRUDoperations.entity.Status;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-public class OrderRequest {
-    public int id;
-    public int productId;
-    public float taxAmount;
-    public float nonTaxAmount;
-
+public class ApiResponse {
     @Enumerated(EnumType.STRING)
     public Status status;
-    public OrderRequest() {
+    private int id;
+    private int productId;
+    private float taxAmount;
+    private float nonTaxAmount;
 
+    public ApiResponse() {
     }
-    public OrderRequest(int productId, float taxAmount, float nonTaxAmount, Status status) {
+
+    public ApiResponse(Status status, int id, int productId, float taxAmount, float nonTaxAmount) {
+        this.status = status;
+        this.id = id;
         this.productId = productId;
         this.taxAmount = taxAmount;
         this.nonTaxAmount = nonTaxAmount;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -29,14 +38,6 @@ public class OrderRequest {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public int getProductId() {
@@ -65,11 +66,12 @@ public class OrderRequest {
 
     @Override
     public String toString() {
-        return "OrderRequest{" +
-                "productId=" + productId +
+        return "ApiResponse{" +
+                "status=" + status +
+                ", id=" + id +
+                ", productId=" + productId +
                 ", taxAmount=" + taxAmount +
                 ", nonTaxAmount=" + nonTaxAmount +
-                ", status=" + status +
                 '}';
     }
 }

@@ -1,9 +1,6 @@
 package Demo.CRUDoperations.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Orders {
@@ -14,14 +11,33 @@ public class Orders {
     private float taxAmount;
     private float nonTaxAmount;
 
+    @Enumerated(EnumType.STRING)
+    public Status status;
+
     public Orders() {
     }
 
-    public Orders(int id, int productId, float taxAmount, float nonTaxAmount ){
+    public Orders(int id, int productId, float taxAmount, float nonTaxAmount, Status status){
         this.id = id;
         this.productId = productId;
         this.taxAmount = taxAmount;
         this.nonTaxAmount = nonTaxAmount;
+        this.status = status;
+    }
+
+    public Orders(int productId, float taxAmount, float nonTaxAmount, Status status){
+        this.productId = productId;
+        this.taxAmount = taxAmount;
+        this.nonTaxAmount = nonTaxAmount;
+        this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public int getId() {
@@ -56,12 +72,15 @@ public class Orders {
         this.id = id;
     }
 
+
     @Override
     public String toString() {
-        return "orders{" +
+        return "Orders{" +
                 "id=" + id +
-                ", itemsId=" + productId +
-                ", amount=" + taxAmount +
+                ", productId=" + productId +
+                ", taxAmount=" + taxAmount +
+                ", nonTaxAmount=" + nonTaxAmount +
+                ", status=" + status +
                 '}';
     }
 }

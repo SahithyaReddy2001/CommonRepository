@@ -1,6 +1,5 @@
 package Demo.CRUDoperations.controllers;
 
-import Demo.CRUDoperations.model.Entities.Product;
 import Demo.CRUDoperations.model.Entities.dto.request.ProductRequest;
 import Demo.CRUDoperations.model.Entities.dto.response.ProductResponse;
 import Demo.CRUDoperations.services.ProductService;
@@ -10,10 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/products")
-public class ProductsController {
+public class ProductController {
 
     @Autowired
     ProductService productService;

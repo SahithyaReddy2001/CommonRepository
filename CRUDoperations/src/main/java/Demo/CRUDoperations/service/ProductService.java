@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public interface ProductService {
-    ApiResponse<List<ProductResponse>>getProducts();
-    ProductResponse createProduct(ProductRequest productRequest);
-    void deleteProduct(int id);
-    ProductResponse updateProduct(int id,ProductRequest productRequest);
-    ApiResponse getProduct(int id);
+    ApiResponse getProducts();
+    ApiResponse upsert(ProductRequest productRequest) throws Exception;
+    ApiResponse deleteProduct(int id) throws Exception;
+
+    ApiResponse getProduct(int id) throws Exception;
 
 }

@@ -1,18 +1,28 @@
 package Demo.CRUDoperations.entity;
 
-import javax.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+@Getter @Setter @NoArgsConstructor
+@ToString
 @Entity
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Integer id;
+    @NotBlank(message = "name should not be empty")
+            @Column(unique = true)
     String name;
-    float price;
-    float tax;
+    @Min(value = 1,message = "price should br greater than 0")
+    Float price;
+    Float tax;
     @Enumerated(EnumType.STRING)
     Status status;
-    public Product(){}
 
     public Product(int id, String name, float price, float tax, Status status) {
         this.id = id;
@@ -29,56 +39,6 @@ public class Product {
         this.status=status;
     }
 
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", tax=" + tax +
-                ", status=" + status +
-                '}';
-    }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-
-    public float getTax() {
-        return tax;
-    }
-
-    public void setTax(float tax) {
-        this.tax = tax;
-    }
 
 }

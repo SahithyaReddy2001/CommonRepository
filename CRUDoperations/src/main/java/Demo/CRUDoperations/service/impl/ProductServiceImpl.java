@@ -1,73 +1,78 @@
 package Demo.CRUDoperations.service.impl;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
-import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.dto.request.ProductRequest;
 import Demo.CRUDoperations.dto.response.ProductResponse;
+import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.entity.Status;
 import Demo.CRUDoperations.repository.ProductRepository;
 import Demo.CRUDoperations.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductRepository productRepository;
-    public ApiResponse<List<ProductResponse>> getProducts(){
-       List<Product> products= productRepository.findByStatus(Status.ACTIVE);
-       List<ProductResponse> productResponses = products.stream().map(ProductResponse::new).collect(Collectors.toList());
-       return new ApiResponse<List<ProductResponse>>(HttpStatus.OK.value(), productResponses,HttpStatus.OK.getReasonPhrase());
-    }
-    public ProductResponse createProduct(ProductRequest productRequest){
 
-        Product product=createEntity(productRequest);
-        System.out.println(product);
-       return new ProductResponse(productRepository.save(product));
+    public ApiResponse getProducts() {
+        List<ProductResponse> productResponses = productRepository.findByStatus(Status.ACTIVE)
+                .stream().map(ProductResponse::new).collect(Collectors.toList());
+        return new ApiResponse(HttpStatus.OK.value(), productResponses, HttpStatus.OK.getReasonPhrase(), true);
     }
 
-    public void deleteProduct(int id){
-        productRepository.save(deleteProducts(id));
-        //productRepository.deleteById(id);
+
+    public ApiResponse deleteProduct(int id)  {
+
+        Optional<Product> optionalProduct = Optional.of(getProductById(id));
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.setStatus(Status.INACTIVE);
+            productRepository.save(product);
+            return getProducts();
+        }
+
+        return new ApiResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.getReasonPhrase(), false);
     }
 
-    private Product deleteProducts(int id) {
-        // valida
-        //
 
-        Product product=productRepository.findById(id).get();
-
-        product.setStatus(Status.INACTIVE);
-        return product;
+    public ApiResponse getProduct(int id)  {
+        Product product = getProductById(id);
+        ProductResponse productResponse = new ProductResponse(product);
+        return new ApiResponse(HttpStatus.OK.value(), productResponse, HttpStatus.OK.getReasonPhrase(), Boolean.TRUE);
     }
 
-    public ProductResponse updateProduct(int id,ProductRequest productRequest) {
-        Product product=updateEntity(productRequest,id);
-        return new ProductResponse(product);
+
+    public ApiResponse upsert(ProductRequest productRequest)  {
+
+        Optional<Product> optionalProduct = Optional.empty();
+
+        if (!ObjectUtils.isEmpty(productRequest.getId())) {
+            optionalProduct = Optional.of(getProductById(productRequest.id));
+        }
+
+        Product product = optionalProduct.orElse(new Product());
+        product.setName(productRequest.getName());
+        product.setPrice(productRequest.getPrice());
+        product.setTax(productRequest.getTax());
+        product.setStatus(Status.ACTIVE);
+        productRepository.save(product);
+        return new ApiResponse(HttpStatus.CREATED.value(), new ProductResponse(product), HttpStatus.CREATED.getReasonPhrase(), true);
     }
 
-    public ApiResponse getProduct(int id) {
-        ProductResponse productResponse=new ProductResponse(productRepository.findById(id).get());
-         return new ApiResponse(HttpStatus.OK.value(),productResponse,HttpStatus.OK.getReasonPhrase());
 
-    }
-    private Product createEntity(ProductRequest productRequest){
-        return  new Product(productRequest.name,productRequest.price,productRequest.tax,productRequest.status);
+    private Product getProductById(Integer id)  {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if(!optionalProduct.isPresent())
+            throw new NoSuchElementException("Inavlid product id");
+        return optionalProduct.get();
     }
 
-    private Product updateEntity(ProductRequest productRequest,int id) {
-        Product existingProduct = productRepository.findById(id).orElse(new Product());
-            existingProduct.setName(productRequest.getName());
-            existingProduct.setPrice(productRequest.getPrice());
-            existingProduct.setTax(productRequest.getTax());
-            existingProduct.setStatus(productRequest.getStatus());
-            productRepository.save(existingProduct);
-            return existingProduct;
-
-    }
 }

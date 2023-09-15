@@ -2,9 +2,13 @@ package Demo.CRUDoperations.dto.response;
 
 import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.dto.request.ProductRequest;
+import lombok.*;
 
+@Setter
+@Getter
+@ToString
 public class ProductResponse extends ProductRequest {
-    int id;
+
     public ProductResponse(){
         super();
     }

@@ -1,5 +1,6 @@
 package Demo.CRUDoperations.controller;
 
+import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.OrderRequest;
 import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,29 +20,29 @@ public class OrderController {
     OrderService orderServiceImps;
 
     @PostMapping
-    public ResponseEntity<OrderResponse> saveOrders(@RequestBody OrderRequest orderRequest){
+    public ApiResponse saveOrders(@Valid @RequestBody OrderRequest orderRequest){
         return  orderServiceImps.createOrders(orderRequest);
     }
 
     @GetMapping
-    public List<OrderResponse> getOrders(){
-         return orderServiceImps.getOrders();
+    public ApiResponse getOrders(){
+        return orderServiceImps.getOrders();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable int id) {
+    public ApiResponse getOrder(@PathVariable int id) {
         return orderServiceImps.getAllOrders(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponse> updateOrders(@PathVariable int id, @RequestBody OrderRequest orderRequest) {
+    public ApiResponse updateOrders(@PathVariable int id, @Valid @RequestBody OrderRequest orderRequest) {
         return orderServiceImps.updateOrders(id,orderRequest);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<OrderResponse>> deleteOrders(@PathVariable int id ){
+    public ApiResponse deleteOrders(@PathVariable int id ){
         orderServiceImps.deleteOrders(id);
-        return ResponseEntity.status(HttpStatus.OK).body(orderServiceImps.getOrders());
+        return orderServiceImps.getOrders();
     }
 
 }

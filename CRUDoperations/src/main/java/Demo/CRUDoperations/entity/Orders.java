@@ -1,18 +1,20 @@
 package Demo.CRUDoperations.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 @Entity
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int productId;
-    private float taxAmount;
-    private float nonTaxAmount;
+    private Integer productId;
+    private Float taxAmount;
+    private Float nonTaxAmount;
 
+    @Column(columnDefinition = "enum('ADDED','DELETED','ACTIVE','INACTIVE') default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
-    public Status status;
+    public Status status = Status.ACTIVE;
 
     public Orders() {
     }
@@ -29,7 +31,7 @@ public class Orders {
         this.productId = productId;
         this.taxAmount = taxAmount;
         this.nonTaxAmount = nonTaxAmount;
-        this.status = status;
+        //this.status = status;
     }
 
     public Status getStatus() {
@@ -40,7 +42,7 @@ public class Orders {
         this.status = status;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -48,11 +50,11 @@ public class Orders {
         return productId;
     }
 
-    public float getTaxAmount() {
+    public Float getTaxAmount() {
         return taxAmount;
     }
 
-    public float getNonTaxAmount() {
+    public Float getNonTaxAmount() {
         return nonTaxAmount;
     }
 

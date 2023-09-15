@@ -1,77 +1,64 @@
 package Demo.CRUDoperations.apiresponse;
 
-import Demo.CRUDoperations.entity.Status;
-
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import Demo.CRUDoperations.dto.response.ProductResponse;
+import Demo.CRUDoperations.entity.Product;
 
 public class ApiResponse {
-    @Enumerated(EnumType.STRING)
-    public Status status;
-    private int id;
-    private int productId;
-    private float taxAmount;
-    private float nonTaxAmount;
+    int statuscode;
+    Object data;
+    String StatusMessage;
 
-    public ApiResponse() {
+    Boolean success;
+    public ApiResponse(){
+
     }
 
-    public ApiResponse(Status status, int id, int productId, float taxAmount, float nonTaxAmount) {
-        this.status = status;
-        this.id = id;
-        this.productId = productId;
-        this.taxAmount = taxAmount;
-        this.nonTaxAmount = nonTaxAmount;
+    public ApiResponse(int statuscode, Object data, String statusMessage,Boolean success) {
+        this.statuscode = statuscode;
+        this.data = data;
+        StatusMessage = statusMessage;
+        this.success=success;
     }
 
-    public Status getStatus() {
-        return status;
+    public int getStatuscode() {
+        return statuscode;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatuscode(int statuscode) {
+        this.statuscode = statuscode;
     }
 
-    public int getId() {
-        return id;
+    public Object getData() {
+        return data;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setData(Object data) {
+        this.data = data;
     }
 
-    public int getProductId() {
-        return productId;
+    public String getStatusMessage() {
+        return StatusMessage;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setStatusMessage(String statusMessage) {
+        StatusMessage = statusMessage;
     }
 
-    public float getTaxAmount() {
-        return taxAmount;
+    public Boolean getSuccess() {
+        return success;
     }
 
-    public void setTaxAmount(float taxAmount) {
-        this.taxAmount = taxAmount;
-    }
-
-    public float getNonTaxAmount() {
-        return nonTaxAmount;
-    }
-
-    public void setNonTaxAmount(float nonTaxAmount) {
-        this.nonTaxAmount = nonTaxAmount;
+    public void setSuccess(Boolean success) {
+        this.success = success;
     }
 
     @Override
     public String toString() {
         return "ApiResponse{" +
-                "status=" + status +
-                ", id=" + id +
-                ", productId=" + productId +
-                ", taxAmount=" + taxAmount +
-                ", nonTaxAmount=" + nonTaxAmount +
+                "statuscode=" + statuscode +
+                ", data=" + data +
+                ", StatusMessage='" + StatusMessage + '\'' +
+                ", success=" + success +
                 '}';
     }
 }

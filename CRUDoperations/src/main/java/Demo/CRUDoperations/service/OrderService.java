@@ -1,5 +1,6 @@
 package Demo.CRUDoperations.service;
 
+import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.OrderRequest;
 import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
@@ -10,13 +11,13 @@ import java.util.List;
 
 @Service
 public interface OrderService {
-    List<OrderResponse> getOrders();
+    ApiResponse getOrders();
 
-    ResponseEntity<OrderResponse> createOrders(OrderRequest orderRequest);
+    ApiResponse createOrders(OrderRequest orderRequest);
 
-    ResponseEntity<OrderResponse> getAllOrders(int id);
+    ApiResponse getAllOrders(int id);
 
-    ResponseEntity<OrderResponse> updateOrders(int id, OrderRequest orderRequest);
+    ApiResponse updateOrders(int id, OrderRequest orderRequest);
 
-    void deleteOrders(int id);
+    ApiResponse deleteOrders(int id);
 }

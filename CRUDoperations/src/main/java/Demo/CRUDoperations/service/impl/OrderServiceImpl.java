@@ -1,5 +1,6 @@
 package Demo.CRUDoperations.service.impl;
 
+import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.OrderRequest;
 import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -21,39 +23,40 @@ public class OrderServiceImpl implements OrderService {
     OrdersRepository ordersRepository;
 
 
-    public List<OrderResponse> getOrders(){
+    public ApiResponse getOrders(){
 
-        List<Orders> orders=ordersRepository.findAll();
+        List<Orders> orders=ordersRepository.findByStatus(Status.ACTIVE);
         List<OrderResponse> orderResponses=new ArrayList<>();
         for (Orders o:orders) {
             orderResponses.add(new OrderResponse(o));
         }
-        return orderResponses;
+        return new ApiResponse(HttpStatus.OK.value(),orderResponses,HttpStatus.OK.getReasonPhrase(),true);
     }
 
-    public ResponseEntity<OrderResponse> createOrders(OrderRequest orderRequest) {
+    public ApiResponse createOrders(OrderRequest orderRequest) {
         Orders orders=createEntity(orderRequest);
-        return  new ResponseEntity<>(new OrderResponse(ordersRepository.save(orders)), HttpStatus.CREATED);
+        ordersRepository.save(orders);
+        return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders),HttpStatus.CREATED.getReasonPhrase(),true);
     }
 
-    public ResponseEntity<OrderResponse> getAllOrders(int id) {
+    public ApiResponse getAllOrders(int id) {
         Optional<Orders> orders = ordersRepository.findById(id);
         if(orders.isPresent()){
-            return new ResponseEntity<>(new OrderResponse(orders.get()),HttpStatus.OK);
+            return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders.get()),HttpStatus.OK.getReasonPhrase(),true);
         }
         else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ApiResponse(HttpStatus.BAD_REQUEST.value(),null,HttpStatus.BAD_REQUEST.getReasonPhrase(), false);
         }
 
     }
 
-    public ResponseEntity<OrderResponse> updateOrders(int id, OrderRequest orderRequest) {
+    public ApiResponse updateOrders(int id, OrderRequest orderRequest) {
        Orders orders=updateEntity(orderRequest,id);
-        return new ResponseEntity<>(new OrderResponse(ordersRepository.save(orders)),HttpStatus.OK);
+       return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders),HttpStatus.OK.getReasonPhrase(),true);
 
     }
 
-    public void deleteOrders(int id) {
+    public ApiResponse deleteOrders(int id) {
         /*Optional<Orders> orders = ordersRepository.findById(id);
         if(orders.isPresent()){
             ordersRepository.deleteById(id);
@@ -62,15 +65,13 @@ public class OrderServiceImpl implements OrderService {
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }*/
-        System.out.println("okk");
         ordersRepository.save(deleteOrder(id));
-
+        return new ApiResponse(HttpStatus.OK.value(),ordersRepository.findAll().stream().map(n->new OrderResponse(n)).collect(Collectors.toList()),HttpStatus.OK.getReasonPhrase(),true);
     }
 
     private Orders deleteOrder(int id) {
         Orders order=ordersRepository.findById(id).get();
         order.setStatus(Status.INACTIVE);
-        System.out.println(order);
         return order;
     }
 
@@ -86,6 +87,5 @@ public class OrderServiceImpl implements OrderService {
         existingOrder.setStatus(productRequest.getStatus());
         ordersRepository.save(existingOrder);
         return existingOrder;
-
     }
 }

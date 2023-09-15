@@ -4,11 +4,18 @@ import Demo.CRUDoperations.entity.Status;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 public class OrderRequest {
     public int id;
+    @NotNull(message = "product Id is Mandatory")
     public int productId;
+    @NotNull(message = "Tax Amount is Mandatory")
+    @Min(1)
     public float taxAmount;
+    @NotNull(message = "Non Tax Amount is Mandatory")
+    @Min(1)
     public float nonTaxAmount;
 
     @Enumerated(EnumType.STRING)

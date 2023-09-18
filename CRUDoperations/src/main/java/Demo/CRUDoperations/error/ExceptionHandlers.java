@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 public class ExceptionHandlers {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoSuchElementException.class)
-    public String noData(Exception e) {
+    public String noData(RuntimeException e) {
         return "id doesn't exists";
     }
 

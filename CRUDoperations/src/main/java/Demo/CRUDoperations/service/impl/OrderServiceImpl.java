@@ -1,6 +1,7 @@
 package Demo.CRUDoperations.service.impl;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
+import Demo.CRUDoperations.download.ExcelDownload;
 import Demo.CRUDoperations.dto.request.OrderRequest;
 import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
@@ -9,9 +10,10 @@ import Demo.CRUDoperations.repository.OrdersRepository;
 import Demo.CRUDoperations.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrdersRepository ordersRepository;
 
-
+    //GET REQUEST
     public ApiResponse getOrders(){
 
         List<Orders> orders=ordersRepository.findByStatus(Status.ACTIVE);
@@ -33,29 +35,26 @@ public class OrderServiceImpl implements OrderService {
         return new ApiResponse(HttpStatus.OK.value(),orderResponses,HttpStatus.OK.getReasonPhrase(),true);
     }
 
+    //POST REQUEST
     public ApiResponse createOrders(OrderRequest orderRequest) {
         Orders orders=createEntity(orderRequest);
         ordersRepository.save(orders);
         return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders),HttpStatus.CREATED.getReasonPhrase(),true);
     }
 
+    //GET REQUEST BY ID
     public ApiResponse getAllOrders(int id) {
         Optional<Orders> orders = ordersRepository.findById(id);
         if(orders.isPresent()){
             return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders.get()),HttpStatus.OK.getReasonPhrase(),true);
         }
         else{
-            return new ApiResponse(HttpStatus.BAD_REQUEST.value(),null,HttpStatus.BAD_REQUEST.getReasonPhrase(), false);
+            return new ApiResponse(HttpStatus.BAD_REQUEST.value(),null,"order not exist in system with given id "+id, false);
         }
 
     }
 
-    public ApiResponse updateOrders(int id, OrderRequest orderRequest) {
-       Orders orders=updateEntity(orderRequest,id);
-       return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders),HttpStatus.OK.getReasonPhrase(),true);
-
-    }
-
+    //DELETE REQUEST
     public ApiResponse deleteOrders(int id) {
         /*Optional<Orders> orders = ordersRepository.findById(id);
         if(orders.isPresent()){
@@ -79,13 +78,26 @@ public class OrderServiceImpl implements OrderService {
         return  new Orders(orderRequest.productId,orderRequest.nonTaxAmount,orderRequest.taxAmount,orderRequest.status);
     }
 
-    private Orders updateEntity(OrderRequest productRequest,int id) {
-        Orders existingOrder = ordersRepository.findById(id).get();
-        existingOrder.setProductId(productRequest.getProductId());
-        existingOrder.setNonTaxAmount(productRequest.getNonTaxAmount());
-        existingOrder.setTaxAmount(productRequest.getTaxAmount());
-        existingOrder.setStatus(productRequest.getStatus());
+    //PUT REQUEST
+    public ApiResponse updateOrders(OrderRequest orderRequest) {
+        Orders orders = updateEntity(orderRequest);
+        return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders),HttpStatus.OK.getReasonPhrase(),true);
+
+    }
+    private Orders updateEntity(OrderRequest orderRequest) {
+        Orders existingOrder = (null == orderRequest.getId() ? new Orders() : ordersRepository.getById(orderRequest.getId()));
+        existingOrder.setProductId(orderRequest.getProductId());
+        existingOrder.setNonTaxAmount(orderRequest.getNonTaxAmount());
+        existingOrder.setTaxAmount(orderRequest.getTaxAmount());
+        existingOrder.setStatus(Status.ACTIVE);
         ordersRepository.save(existingOrder);
         return existingOrder;
+    }
+
+    //DOWNLOAD ORDERS DETAILS TO EXCEL
+    public ByteArrayInputStream downloadOrders() throws IOException {
+        List<Orders> orders = ordersRepository.findAll();
+        ByteArrayInputStream data = ExcelDownload.orderDownload(orders);
+        return data;
     }
 }

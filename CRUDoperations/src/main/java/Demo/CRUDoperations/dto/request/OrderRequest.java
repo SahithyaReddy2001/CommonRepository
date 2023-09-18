@@ -1,14 +1,22 @@
 package Demo.CRUDoperations.dto.request;
 
 import Demo.CRUDoperations.entity.Status;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+/*@Getter
+@Setter
+@NoArgsConstructor
+@ToString*/
 public class OrderRequest {
-    public int id;
+    public Integer id;
     @NotNull(message = "product Id is Mandatory")
     public int productId;
     @NotNull(message = "Tax Amount is Mandatory")
@@ -30,11 +38,11 @@ public class OrderRequest {
         this.status = status;
     }
 
-    public int getId() {
+   public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

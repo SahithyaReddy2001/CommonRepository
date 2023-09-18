@@ -1,9 +1,17 @@
 package Demo.CRUDoperations.entity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 @Entity
+/*@Getter
+@Setter
+@NoArgsConstructor
+@ToString*/
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +42,8 @@ public class Orders {
         //this.status = status;
     }
 
-    public Status getStatus() {
+
+   public Status getStatus() {
         return status;
     }
 

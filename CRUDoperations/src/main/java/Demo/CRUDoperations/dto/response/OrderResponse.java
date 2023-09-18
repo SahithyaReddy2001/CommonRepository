@@ -16,6 +16,7 @@ public class OrderResponse extends OrderRequest {
         this.nonTaxAmount = orders.getNonTaxAmount();
         this.taxAmount = orders.getTaxAmount();
         this.status = orders.getStatus();
+
     }
 }
 

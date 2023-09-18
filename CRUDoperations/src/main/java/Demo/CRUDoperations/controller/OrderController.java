@@ -6,11 +6,16 @@ import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
 import Demo.CRUDoperations.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -34,9 +39,9 @@ public class OrderController {
         return orderServiceImps.getAllOrders(id);
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse updateOrders(@PathVariable int id, @Valid @RequestBody OrderRequest orderRequest) {
-        return orderServiceImps.updateOrders(id,orderRequest);
+    @PutMapping
+    public ApiResponse updateOrders(@Valid @RequestBody OrderRequest orderRequest) {
+        return orderServiceImps.updateOrders(orderRequest);
     }
 
     @DeleteMapping("/{id}")
@@ -44,5 +49,17 @@ public class OrderController {
         orderServiceImps.deleteOrders(id);
         return orderServiceImps.getOrders();
     }
+
+    @GetMapping("/download")
+    public ResponseEntity<InputStreamResource> download() throws IOException {
+        String fileName = "Orders.xlsx";
+        ByteArrayInputStream inputStream = orderServiceImps.downloadOrders();
+        InputStreamResource response = new InputStreamResource(inputStream);
+        ResponseEntity<InputStreamResource> responseEntity =ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,"attachement;filename="+fileName)
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(response);
+        return responseEntity;
+    }
+
 
 }

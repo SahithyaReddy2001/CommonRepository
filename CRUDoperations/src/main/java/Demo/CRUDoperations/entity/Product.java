@@ -32,7 +32,7 @@ public class Product {
         this.status = status;
     }
 
-    public Product(String name, float price, float tax,Status status) {
+    public Product(String name, float price, float tax) {
         this.name = name;
         this.price = price;
         this.tax = tax;

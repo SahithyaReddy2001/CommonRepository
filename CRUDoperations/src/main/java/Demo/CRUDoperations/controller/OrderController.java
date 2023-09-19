@@ -60,6 +60,4 @@ public class OrderController {
                 .contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(response);
         return responseEntity;
     }
-
-
 }

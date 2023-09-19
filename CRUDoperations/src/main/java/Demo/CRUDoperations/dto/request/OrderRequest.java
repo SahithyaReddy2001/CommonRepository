@@ -11,10 +11,10 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-/*@Getter
+@Getter
 @Setter
 @NoArgsConstructor
-@ToString*/
+@ToString
 public class OrderRequest {
     public Integer id;
     @NotNull(message = "product Id is Mandatory")
@@ -28,9 +28,7 @@ public class OrderRequest {
 
     @Enumerated(EnumType.STRING)
     public Status status;
-    public OrderRequest() {
 
-    }
     public OrderRequest(int productId, float taxAmount, float nonTaxAmount, Status status) {
         this.productId = productId;
         this.taxAmount = taxAmount;
@@ -38,6 +36,9 @@ public class OrderRequest {
         this.status = status;
     }
 
+    /*public OrderRequest() {
+
+    }
    public Integer getId() {
         return id;
     }
@@ -86,5 +87,5 @@ public class OrderRequest {
                 ", nonTaxAmount=" + nonTaxAmount +
                 ", status=" + status +
                 '}';
-    }
+    }*/
 }

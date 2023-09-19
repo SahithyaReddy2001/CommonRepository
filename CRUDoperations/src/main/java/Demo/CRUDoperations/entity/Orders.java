@@ -8,10 +8,10 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 @Entity
-/*@Getter
+@Getter
 @Setter
 @NoArgsConstructor
-@ToString*/
+@ToString
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +23,6 @@ public class Orders {
     @Column(columnDefinition = "enum('ADDED','DELETED','ACTIVE','INACTIVE') default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
     public Status status = Status.ACTIVE;
-
-    public Orders() {
-    }
 
     public Orders(int id, int productId, float taxAmount, float nonTaxAmount, Status status){
         this.id = id;
@@ -42,8 +39,10 @@ public class Orders {
         //this.status = status;
     }
 
+    /*public Orders() {
+    }
 
-   public Status getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -93,5 +92,5 @@ public class Orders {
                 ", nonTaxAmount=" + nonTaxAmount +
                 ", status=" + status +
                 '}';
-    }
+    }*/
 }

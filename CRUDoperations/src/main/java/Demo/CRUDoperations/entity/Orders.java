@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Entity
 /*@Getter
@@ -16,7 +17,12 @@ public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private Integer productId;
+
+    @ManyToOne(targetEntity = Product.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id", referencedColumnName = "id") // This maps to the foreign key column
+    private Product product;
+
+    //private Integer productId;
     private Float taxAmount;
     private Float nonTaxAmount;
 
@@ -27,16 +33,18 @@ public class Orders {
     public Orders() {
     }
 
-    public Orders(int id, int productId, float taxAmount, float nonTaxAmount, Status status){
+    public Orders(int id, Product product, float taxAmount, float nonTaxAmount, Status status){
         this.id = id;
-        this.productId = productId;
+        //this.productId = productId;
+        this.product = product;
         this.taxAmount = taxAmount;
         this.nonTaxAmount = nonTaxAmount;
         this.status = status;
     }
 
-    public Orders(int productId, float taxAmount, float nonTaxAmount, Status status){
-        this.productId = productId;
+    public Orders(Product product, float taxAmount, float nonTaxAmount, Status status){
+        //this.productId = productId;
+        this.product = product;
         this.taxAmount = taxAmount;
         this.nonTaxAmount = nonTaxAmount;
         //this.status = status;

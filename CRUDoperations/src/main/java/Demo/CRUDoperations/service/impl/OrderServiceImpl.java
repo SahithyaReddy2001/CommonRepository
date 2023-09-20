@@ -5,8 +5,10 @@ import Demo.CRUDoperations.download.ExcelDownload;
 import Demo.CRUDoperations.dto.request.OrderRequest;
 import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
+import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.entity.Status;
 import Demo.CRUDoperations.repository.OrdersRepository;
+import Demo.CRUDoperations.repository.ProductRepository;
 import Demo.CRUDoperations.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrdersRepository ordersRepository;
 
+    @Autowired
+    ProductRepository productRepository;
+
     //GET REQUEST
     public ApiResponse getOrders(){
 
@@ -40,6 +45,9 @@ public class OrderServiceImpl implements OrderService {
         Orders orders=createEntity(orderRequest);
         ordersRepository.save(orders);
         return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(orders),HttpStatus.CREATED.getReasonPhrase(),true);
+    }
+    private Orders createEntity(OrderRequest orderRequest){
+        return  new Orders(orderRequest.product,orderRequest.nonTaxAmount,orderRequest.taxAmount,orderRequest.status);
     }
 
     //GET REQUEST BY ID
@@ -71,12 +79,11 @@ public class OrderServiceImpl implements OrderService {
     private Orders deleteOrder(int id) {
         Orders order=ordersRepository.findById(id).get();
         order.setStatus(Status.INACTIVE);
+        order.getProduct().setStatus(Status.INACTIVE);
+        //product.setStatus(Status.INACTIVE);
         return order;
     }
 
-    private Orders createEntity(OrderRequest orderRequest){
-        return  new Orders(orderRequest.productId,orderRequest.nonTaxAmount,orderRequest.taxAmount,orderRequest.status);
-    }
 
     //PUT REQUEST
     public ApiResponse updateOrders(OrderRequest orderRequest) {
@@ -86,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
     }
     private Orders updateEntity(OrderRequest orderRequest) {
         Orders existingOrder = (null == orderRequest.getId() ? new Orders() : ordersRepository.getById(orderRequest.getId()));
-        existingOrder.setProductId(orderRequest.getProductId());
+        existingOrder.setProduct(orderRequest.getProduct());
         existingOrder.setNonTaxAmount(orderRequest.getNonTaxAmount());
         existingOrder.setTaxAmount(orderRequest.getTaxAmount());
         existingOrder.setStatus(Status.ACTIVE);

@@ -12,7 +12,7 @@ public class OrderResponse extends OrderRequest {
     }
     public OrderResponse(Orders orders){
         this.id = orders.getId();
-        this.productId = orders.getProductId();
+        this.product= orders.getProduct();
         this.nonTaxAmount = orders.getNonTaxAmount();
         this.taxAmount = orders.getTaxAmount();
         this.status = orders.getStatus();

@@ -33,7 +33,7 @@ public class ExcelDownload {
                 Row row1 = sheet.createRow(rowIndex);
                 rowIndex++;
                 row1.createCell(0).setCellValue(o.getId());
-                row1.createCell(1).setCellValue(o.getProductId());
+                row1.createCell(1).setCellValue(o.getProduct().getId());
                 row1.createCell(2).setCellValue(o.getTaxAmount());
                 row1.createCell(3).setCellValue(o.getNonTaxAmount());
                 row1.createCell(4).setCellValue(String.valueOf(o.getStatus()));

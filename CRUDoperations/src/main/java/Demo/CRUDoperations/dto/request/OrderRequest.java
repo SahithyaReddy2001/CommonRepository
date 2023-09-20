@@ -1,15 +1,16 @@
 package Demo.CRUDoperations.dto.request;
 
+import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.entity.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /*@Getter
 @Setter
@@ -17,8 +18,12 @@ import javax.validation.constraints.NotNull;
 @ToString*/
 public class OrderRequest {
     public Integer id;
-    @NotNull(message = "product Id is Mandatory")
-    public int productId;
+    /*@NotNull(message = "product Id is Mandatory")
+    public int productId;*/
+    //@ManyToOne(targetEntity = Product.class, cascade = CascadeType.ALL)
+    //@JoinColumn(name = "productId", referencedColumnName = "id") // This maps to the foreign key column
+    public Product product;
+
     @NotNull(message = "Tax Amount is Mandatory")
     @Min(1)
     public float taxAmount;
@@ -31,8 +36,8 @@ public class OrderRequest {
     public OrderRequest() {
 
     }
-    public OrderRequest(int productId, float taxAmount, float nonTaxAmount, Status status) {
-        this.productId = productId;
+    public OrderRequest(Product product, float taxAmount, float nonTaxAmount, Status status) {
+        this.product = product;
         this.taxAmount = taxAmount;
         this.nonTaxAmount = nonTaxAmount;
         this.status = status;

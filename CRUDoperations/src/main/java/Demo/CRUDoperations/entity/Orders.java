@@ -9,10 +9,10 @@ import javax.validation.constraints.*;
 import java.util.List;
 
 @Entity
-/*@Getter
+@Getter
 @Setter
 @NoArgsConstructor
-@ToString*/
+@ToString
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +30,8 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     public Status status = Status.ACTIVE;
 
-    public Orders() {
-    }
+    /*public Orders() {
+    }*/
 
     public Orders(int id, Product product, float taxAmount, float nonTaxAmount, Status status){
         this.id = id;
@@ -51,7 +51,7 @@ public class Orders {
     }
 
 
-   public Status getStatus() {
+   /*public Status getStatus() {
         return status;
     }
 
@@ -63,9 +63,7 @@ public class Orders {
         return id;
     }
 
-    public int getProductId() {
-        return productId;
-    }
+
 
     public Float getTaxAmount() {
         return taxAmount;
@@ -83,9 +81,6 @@ public class Orders {
         this.taxAmount = taxAmount;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
-    }
 
     public void setId(int id) {
         this.id = id;
@@ -96,10 +91,9 @@ public class Orders {
     public String toString() {
         return "Orders{" +
                 "id=" + id +
-                ", productId=" + productId +
                 ", taxAmount=" + taxAmount +
                 ", nonTaxAmount=" + nonTaxAmount +
                 ", status=" + status +
                 '}';
-    }
+    }*/
 }

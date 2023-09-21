@@ -13,6 +13,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -30,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
 
     @Autowired
+    @Lazy
     MailService mailService;
 
    /* public ApiResponse fileData(MultipartFile file)throws IOException {
@@ -124,6 +126,7 @@ public class ProductServiceImpl implements ProductService {
     public ApiResponse getProducts() {
         List<ProductResponse> productResponses = productRepository.findByStatus(Status.ACTIVE)
                 .stream().map(ProductResponse::new).collect(Collectors.toList());
+        mailService.sendReport();
         return new ApiResponse(HttpStatus.OK.value(), productResponses, HttpStatus.OK.getReasonPhrase(), true);
     }
 
@@ -152,7 +155,6 @@ public class ProductServiceImpl implements ProductService {
     public ApiResponse upsert(ProductRequest productRequest) {
 
         Optional<Product> optionalProduct = Optional.empty();
-        System.out.println(productRequest.getId());
         if (!ObjectUtils.isEmpty(productRequest.getId())) {
             optionalProduct = Optional.of(getProductById(productRequest.id));
         }
@@ -162,9 +164,9 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productRequest.getPrice());
         product.setTax(productRequest.getTax());
         product.setStatus(Status.ACTIVE);
-        productRepository.save(product);
-        mailService.sendMail(productRequest);
-        return new ApiResponse(HttpStatus.CREATED.value(), new ProductResponse(product), HttpStatus.CREATED.getReasonPhrase(), true);
+        ProductResponse productResponse=new ProductResponse(productRepository.save(product));
+        mailService.sendMail(productResponse);
+        return new ApiResponse(HttpStatus.CREATED.value(), productResponse, HttpStatus.CREATED.getReasonPhrase(), true);
     }
 
 

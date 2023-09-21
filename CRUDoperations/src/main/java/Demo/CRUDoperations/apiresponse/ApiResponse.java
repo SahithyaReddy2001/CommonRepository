@@ -13,8 +13,5 @@ public class ApiResponse {
     int statuscode;
     Object data;
     String StatusMessage;
-
     Boolean success;
-
-
 }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,13 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
-
+    @GetMapping("/html")
+    public  String htmlResponse(ModelMap modelMap){
+        modelMap.addAttribute("name","bag");
+        modelMap.addAttribute("price","120");
+        modelMap.addAttribute("tax","12");
+        return "emailformat";
+    }
     @PostMapping(value = "/file")
     public ApiResponse fileUpload(@RequestBody MultipartFile file) throws IOException {
         return productService.fileData(file);
@@ -46,22 +53,26 @@ public class ProductController {
 
     @GetMapping(value = "/{id}")
     public ApiResponse getProductById(@Valid @PathVariable int id) throws Exception {
+        System.out.println("get");
         return productService.getProduct(id);
     }
 
     @PostMapping
     public ApiResponse creatingProduct(@Valid @RequestBody ProductRequest productRequest) throws Exception {
+
         return productService.upsert(productRequest);
     }
 
     @DeleteMapping(value = "/{id}")
     public ApiResponse deleteProduct(@PathVariable int id) throws Exception {
+
         productService.deleteProduct(id);
         return productService.getProducts();
     }
 
     @PutMapping
     public ApiResponse updateProduct(@Valid @RequestBody ProductRequest productRequest) throws Exception {
+        System.out.println("put");
         return productService.upsert(productRequest);
     }
 

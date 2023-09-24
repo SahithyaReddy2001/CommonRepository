@@ -3,21 +3,18 @@ package Demo.CRUDoperations.controller;
 import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.ProductRequest;
 import Demo.CRUDoperations.service.ProductService;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 
 @RestController
@@ -53,7 +50,7 @@ public class ProductController {
     @PostMapping
     public ApiResponse creatingProduct(@Valid @RequestBody ProductRequest productRequest) throws Exception {
 
-        return productService.upsert(productRequest);
+        return productService.consumer(productRequest);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -65,8 +62,28 @@ public class ProductController {
 
     @PutMapping
     public ApiResponse updateProduct(@Valid @RequestBody ProductRequest productRequest) throws Exception {
-        return productService.upsert(productRequest);
+        return productService.consumer(productRequest);
     }
 
+    @GetMapping(value = "orders/{id}")
+    public ApiResponse getOrdersByProduct(@PathVariable int id){
+        return productService.getProductOrders(id);
+    }
+
+
+    @GetMapping("/{offset}/{limit}")
+    public ApiResponse getProductsByOffset(@PathVariable int offset,@PathVariable int limit){
+        return productService.getProductsByOffset(offset,limit);
+    }
+
+    @GetMapping("/sort/{sort}")
+    public  ApiResponse sortByName(@PathVariable String sort){
+        return productService.sortByName(sort);
+    }
+
+    @GetMapping("/report")
+    public  ApiResponse forEmailReport(@RequestParam String email){
+        return productService.forEmailReport(email);
+    }
 
 }

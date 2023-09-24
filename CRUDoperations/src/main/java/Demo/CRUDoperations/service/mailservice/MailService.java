@@ -34,7 +34,6 @@ public class MailService {
     TemplateEngine templateEngine;
     //@Scheduled(fixedDelay = 10000)
     public void scheuler(){
-        System.out.println("schedular");
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper message=new MimeMessageHelper(mimeMessage,"UTF-8");
@@ -67,14 +66,13 @@ public class MailService {
         }
 
     }
-    //@Scheduled(fixedRate = 10000)
-    public  void sendReport(){
+
+    public  void sendReport(String email){
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper message=new MimeMessageHelper(mimeMessage,true);
             message.setTo("saieshwarmanchala42@gmail.com");
             message.setSubject("test subject");
-            //InputStreamResource csvData=new InputStreamResource(new ByteArrayInputStream(toCsvFile()));
             ByteArrayDataSource csvData=new ByteArrayDataSource(toCsvFile(),"text/csv");
             message.setText("Report file",true);
             message.addAttachment("report.csv",csvData);
@@ -96,12 +94,50 @@ public class MailService {
             data.append(product.getTax()).append(",");
             data.append(product.getStatus()).append("\n");
         }
-        //System.out.println(data.toString());
         return data.toString().getBytes();
     }
 
     private List<ProductResponse> getProduts(){
-        return productRepository.findByStatus(Status.ACTIVE)
+        return productRepository.findByStatus()
                 .stream().map(ProductResponse::new).collect(Collectors.toList());
     }
+
+    /*public void emailServices(Email email,Object product){
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
+            message.setTo("saieshwarmanchala42@gmail.com");
+            Context context=new Context();
+            String data;
+            switch (email){
+                case INSERT:
+                    message.setSubject("Product is added to our list");
+                    context.setVariable("product",product);
+                    data=templateEngine.process("email-format",context);
+                    message.setText(data,true);
+                    break;
+                case REPORT:
+                    message.setSubject("Report on Procuts");
+                    ByteArrayDataSource csvData=new ByteArrayDataSource(toCsvFile(),"text/csv");
+                    message.setText("Report file",true);
+                    message.addAttachment("report.csv",csvData);
+                    break;
+                case SCHEDULAR:
+                    message.setSubject("schedular mail");
+                    context.setVariable("products",product);
+                    data=templateEngine.process("productstemplate",context);
+                    message.setText(data,true);
+                    break;
+                default:
+                    //return api response as badrequest
+                    break;
+            }
+            javaMailSender.send(mimeMessage);
+
+        }
+        catch (Exception e){
+
+        }
+    }*/
+
 }

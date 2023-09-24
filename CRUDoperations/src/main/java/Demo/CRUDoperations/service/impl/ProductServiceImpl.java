@@ -8,15 +8,22 @@ import Demo.CRUDoperations.entity.Status;
 import Demo.CRUDoperations.repository.ProductRepository;
 import Demo.CRUDoperations.service.ProductService;
 import Demo.CRUDoperations.service.mailservice.MailService;
+import org.apache.kafka.common.protocol.types.Field;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -31,7 +38,6 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
 
     @Autowired
-    @Lazy
     MailService mailService;
 
    /* public ApiResponse fileData(MultipartFile file)throws IOException {
@@ -49,6 +55,9 @@ public class ProductServiceImpl implements ProductService {
         System.out.println(li);
         return new ApiResponse(HttpStatus.CREATED.value(),li,"All products are inserted in data base",true);
     }*/
+
+    @Autowired
+    KafkaTemplate<String, ProductRequest> kafkaTemplate;
 
     public ByteArrayInputStream getFile() throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -122,14 +131,11 @@ public class ProductServiceImpl implements ProductService {
         return new ApiResponse(HttpStatus.CREATED.value(), products, "All products are inserted", true);
     }
 
-
     public ApiResponse getProducts() {
-        List<ProductResponse> productResponses = productRepository.findByStatus(Status.ACTIVE)
+        List<ProductResponse> productResponses = productRepository.findByStatus()
                 .stream().map(ProductResponse::new).collect(Collectors.toList());
-        mailService.sendReport();
         return new ApiResponse(HttpStatus.OK.value(), productResponses, HttpStatus.OK.getReasonPhrase(), true);
     }
-
 
     public ApiResponse deleteProduct(int id) {
 
@@ -144,15 +150,41 @@ public class ProductServiceImpl implements ProductService {
         return new ApiResponse(HttpStatus.BAD_REQUEST.value(), null, HttpStatus.BAD_REQUEST.getReasonPhrase(), false);
     }
 
-
     public ApiResponse getProduct(int id) {
         Product product = getProductById(id);
         ProductResponse productResponse = new ProductResponse(product);
         return new ApiResponse(HttpStatus.OK.value(), productResponse, HttpStatus.OK.getReasonPhrase(), Boolean.TRUE);
     }
 
+    public ApiResponse consumer(ProductRequest productRequest) {
+        System.out.println(productRequest);
+        kafkaTemplate.send("Products", productRequest);
+        return new ApiResponse(HttpStatus.CREATED.value(), productRequest, HttpStatus.CREATED.getReasonPhrase(), true);
+    }
 
-    public ApiResponse upsert(ProductRequest productRequest) {
+    @KafkaListener(topics = "Products", groupId = "Insert_products")
+    public void upsert(ProductRequest productRequest) {
+        System.out.println("consumer");
+        Optional<Product> optionalProduct = Optional.empty();
+        if (!ObjectUtils.isEmpty(productRequest.getId())) {
+            optionalProduct = Optional.of(getProductById(productRequest.id));
+        }
+
+        System.out.println("consumer11");
+        Product product = optionalProduct.orElse(new Product());
+        product.setName(productRequest.getName());
+        product.setPrice(productRequest.getPrice());
+        product.setTax(productRequest.getTax());
+        product.setStatus(Status.ACTIVE);
+        ProductResponse productResponse = new ProductResponse(productRepository.save(product));
+        mailService.sendMail(productResponse);
+
+        System.out.println("consumer1100");
+        //return new ApiResponse(HttpStatus.CREATED.value(), productResponse, HttpStatus.CREATED.getReasonPhrase(), true);
+    }
+
+   /* public ApiResponse upsert(ProductRequest productRequest) {
+
 
         Optional<Product> optionalProduct = Optional.empty();
         if (!ObjectUtils.isEmpty(productRequest.getId())) {
@@ -164,11 +196,41 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productRequest.getPrice());
         product.setTax(productRequest.getTax());
         product.setStatus(Status.ACTIVE);
-        ProductResponse productResponse=new ProductResponse(productRepository.save(product));
+        ProductResponse productResponse = new ProductResponse(productRepository.save(product));
         mailService.sendMail(productResponse);
         return new ApiResponse(HttpStatus.CREATED.value(), productResponse, HttpStatus.CREATED.getReasonPhrase(), true);
+    }*/
+
+
+    public ApiResponse getProductsByOffset(int offset, int limit) {
+        List<ProductResponse> products;
+        if (offset <= 0 || limit < 1) {
+            return new ApiResponse(HttpStatus.BAD_REQUEST.value(), null, "Entered page or page_size is less than 1", false);
+        }
+        products = productRepository.findAll(PageRequest.of(offset - 1, limit)).stream().map(n -> new ProductResponse(n)).collect(Collectors.toList());
+        String message = "TotalPages=" + (productRepository.findAll().size() / limit + 1);
+        return new ApiResponse(HttpStatus.OK.value(), products, message, true);
     }
 
+
+    public ApiResponse getProductOrders(int id) {
+        ApiResponse apiResponse=new ApiResponse(HttpStatus.OK.value(), productRepository.getByProductId(id), "All product orders", true);
+        System.out.println(apiResponse.getData());
+        return apiResponse;
+    }
+
+
+    public ApiResponse sortByName(String sort) {
+        List<ProductResponse> products;
+        products = productRepository.findAll(Sort.by(Sort.Direction.DESC, sort)).stream().map(n -> new ProductResponse(n)).collect(Collectors.toList());
+        return new ApiResponse(HttpStatus.OK.value(), products, "sorted order by " + sort, true);
+    }
+
+    public ApiResponse forEmailReport(String email){
+        mailService.sendReport(email);
+        return new ApiResponse(HttpStatus.OK.value(), "report.csv","Report is send to "+email,true);
+
+    }
 
     private Product getProductById(Integer id) {
         Optional<Product> optionalProduct = productRepository.findById(id);

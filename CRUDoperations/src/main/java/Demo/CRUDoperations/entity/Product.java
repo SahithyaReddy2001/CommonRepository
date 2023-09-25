@@ -4,10 +4,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Getter @Setter @NoArgsConstructor
 @ToString
 @Entity
@@ -23,6 +28,18 @@ public class Product {
     Float tax;
     @Enumerated(EnumType.STRING)
     Status status;
+
+    @CreationTimestamp
+    Date createdDate;
+
+    @UpdateTimestamp
+    Date updatedDate;
+
+    @ManyToOne
+    @JoinColumn(name="customer_id")
+    Customer customer;
+
+
 
     public Product(int id, String name, float price, float tax, Status status) {
         this.id = id;

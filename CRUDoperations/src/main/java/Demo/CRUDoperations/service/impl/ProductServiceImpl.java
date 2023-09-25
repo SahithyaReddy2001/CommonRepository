@@ -7,6 +7,8 @@ import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.entity.Status;
 import Demo.CRUDoperations.repository.ProductRepository;
 import Demo.CRUDoperations.service.ProductService;
+import Demo.CRUDoperations.service.kafkaservice.ConsumerService;
+import Demo.CRUDoperations.service.kafkaservice.ProducerService;
 import Demo.CRUDoperations.service.mailservice.MailService;
 import org.apache.kafka.common.protocol.types.Field;
 import org.apache.poi.ss.usermodel.Cell;
@@ -29,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +42,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     MailService mailService;
+
+    @Autowired
+    KafkaTemplate<String, ProductRequest> kafkaTemplate;
+
+
+    @Autowired
+    ProducerService producerService;
 
    /* public ApiResponse fileData(MultipartFile file)throws IOException {
         InputStream inputStream=file.getInputStream();
@@ -56,8 +66,7 @@ public class ProductServiceImpl implements ProductService {
         return new ApiResponse(HttpStatus.CREATED.value(),li,"All products are inserted in data base",true);
     }*/
 
-    @Autowired
-    KafkaTemplate<String, ProductRequest> kafkaTemplate;
+
 
     public ByteArrayInputStream getFile() throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -157,29 +166,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ApiResponse consumer(ProductRequest productRequest) {
-        System.out.println(productRequest);
+
         kafkaTemplate.send("Products", productRequest);
         return new ApiResponse(HttpStatus.CREATED.value(), productRequest, HttpStatus.CREATED.getReasonPhrase(), true);
     }
 
     @KafkaListener(topics = "Products", groupId = "Insert_products")
     public void upsert(ProductRequest productRequest) {
-        System.out.println("consumer");
         Optional<Product> optionalProduct = Optional.empty();
         if (!ObjectUtils.isEmpty(productRequest.getId())) {
             optionalProduct = Optional.of(getProductById(productRequest.id));
         }
-
-        System.out.println("consumer11");
         Product product = optionalProduct.orElse(new Product());
+        System.out.println(product);
         product.setName(productRequest.getName());
         product.setPrice(productRequest.getPrice());
         product.setTax(productRequest.getTax());
         product.setStatus(Status.ACTIVE);
+        System.out.println(product);
+        //product.getCreatedDate()==null?product.setCreatedDate(LocalDateTime.now()):product.setUpdatedDate(LocalDateTime.now());
         ProductResponse productResponse = new ProductResponse(productRepository.save(product));
-        mailService.sendMail(productResponse);
-
-        System.out.println("consumer1100");
+        producerService.productConformation(productResponse);
         //return new ApiResponse(HttpStatus.CREATED.value(), productResponse, HttpStatus.CREATED.getReasonPhrase(), true);
     }
 

@@ -11,7 +11,7 @@ public class SchedularService {
 
 
     @Scheduled(cron = "${cronExpression}")
-    public void print(){
-        System.out.println("kkk");
+    public void reportSchedular(){
+
     }
 }

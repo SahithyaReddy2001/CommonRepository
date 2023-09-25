@@ -1,10 +1,12 @@
 package Demo.CRUDoperations.controller;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
-import Demo.CRUDoperations.dto.request.OrderRequest;
+import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
 import Demo.CRUDoperations.dto.response.OrderResponse;
 import Demo.CRUDoperations.entity.Orders;
+import Demo.CRUDoperations.entity.Status;
 import Demo.CRUDoperations.service.OrderService;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -24,9 +26,9 @@ public class OrderController {
     @Autowired
     OrderService orderServiceImps;
 
-    @PostMapping
-    public ApiResponse saveOrders(@Valid @RequestBody OrderRequest orderRequest){
-        return  orderServiceImps.createOrders(orderRequest);
+    @PostMapping("/{id}")
+    public void saveOrders(@PathVariable int id){
+        orderServiceImps.createOrders(id);
     }
 
     @GetMapping
@@ -39,10 +41,16 @@ public class OrderController {
         return orderServiceImps.getAllOrders(id);
     }
 
-    @PutMapping
-    public ApiResponse updateOrders(@Valid @RequestBody OrderRequest orderRequest) {
-        return orderServiceImps.updateOrders(orderRequest);
+    @GetMapping("{offset}/{pageSize}/{field}")
+    public ApiResponse paginationAndSorting(@PathVariable int offset, @PathVariable int pageSize, @PathVariable String field){
+        return orderServiceImps.findOrdersWIthPaginationAndSorting(offset,pageSize,field);
     }
+
+    @PutMapping
+    public ApiResponse updateOrders(@Valid @RequestBody UpdateOrderRequest updateOrderRequest) {
+        return orderServiceImps.updateOrders(updateOrderRequest);
+    }
+
 
     @DeleteMapping("/{id}")
     public ApiResponse deleteOrders(@PathVariable int id ){

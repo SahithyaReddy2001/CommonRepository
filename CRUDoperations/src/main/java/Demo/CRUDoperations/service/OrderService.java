@@ -1,7 +1,7 @@
 package Demo.CRUDoperations.service;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
-import Demo.CRUDoperations.dto.request.OrderRequest;
+import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -11,14 +11,19 @@ import java.io.IOException;
 public interface OrderService {
     ApiResponse getOrders();
 
-    ApiResponse createOrders(OrderRequest orderRequest);
+    void createOrders(Integer id);
 
     ApiResponse getAllOrders(int id);
 
-    ApiResponse updateOrders(OrderRequest orderRequest);
+    ApiResponse updateOrders(UpdateOrderRequest updateOrderRequest);
 
     ApiResponse deleteOrders(int id);
 
     ByteArrayInputStream downloadOrders() throws IOException;
+
+    void sendMail(String toEmail, String Subject, String body);
+
+    ApiResponse findOrdersWIthPaginationAndSorting(int offset,int pageSize,String field);
+
 
 }

@@ -1,8 +1,5 @@
 package Demo.CRUDoperations.entity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -12,17 +9,18 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @ManyToOne(targetEntity = Product.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Product.class)
     @JoinColumn(name = "product_id", referencedColumnName = "id") // This maps to the foreign key column
     private Product product;
 
-    //private Integer productId;
+    //private Long productId;
     private Float taxAmount;
     private Float nonTaxAmount;
 
@@ -30,70 +28,24 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     public Status status = Status.ACTIVE;
 
-    /*public Orders() {
-    }*/
-
-    public Orders(int id, Product product, float taxAmount, float nonTaxAmount, Status status){
+    public Orders(Integer id,Status status){
         this.id = id;
         //this.productId = productId;
-        this.product = product;
-        this.taxAmount = taxAmount;
-        this.nonTaxAmount = nonTaxAmount;
         this.status = status;
     }
 
-    public Orders(Product product, float taxAmount, float nonTaxAmount, Status status){
+    public Orders(Integer id, float taxAmount, float nonTaxAMount, Status status){
+        this.id = id;
         //this.productId = productId;
-        this.product = product;
         this.taxAmount = taxAmount;
-        this.nonTaxAmount = nonTaxAmount;
-        //this.status = status;
-    }
-
-
-   /*public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
+        this.nonTaxAmount = nonTaxAMount;
         this.status = status;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-
-
-    public Float getTaxAmount() {
-        return taxAmount;
-    }
-
-    public Float getNonTaxAmount() {
-        return nonTaxAmount;
-    }
-
-    public void setNonTaxAmount(float nonTaxAmount) {
-        this.nonTaxAmount = nonTaxAmount;
-    }
-
-    public void setTaxAmount(float taxAmount) {
+    public Orders(float taxAmount, float nonTaxAMount){
         this.taxAmount = taxAmount;
+        this.nonTaxAmount = nonTaxAMount;
+        this.status = Status.ACTIVE;
     }
 
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Orders{" +
-                "id=" + id +
-                ", taxAmount=" + taxAmount +
-                ", nonTaxAmount=" + nonTaxAmount +
-                ", status=" + status +
-                '}';
-    }*/
 }

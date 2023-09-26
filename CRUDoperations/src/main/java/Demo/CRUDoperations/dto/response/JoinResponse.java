@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 public class JoinResponse{
     private Integer orderId;
-    private String orderStatus;
+    private String   orderStatus;
     private Integer productId;
     private String productName;
     private float price;

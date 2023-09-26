@@ -71,13 +71,14 @@ public class OrderServiceImpl implements OrderService {
         List<JoinResponse> joinResponse=new ArrayList<>();
         Page<Orders> order = ordersRepository.findAll(PageRequest.of(offset,pageSize).withSort(Sort.by(field)));
         for(Orders o:order){
+            System.out.println(o);
             JoinResponse joinResponse1 = new JoinResponse();
             joinResponse1.setOrderId(o.getId());
             joinResponse1.setOrderStatus(String.valueOf(o.getProduct().getStatus()));
             joinResponse1.setProductId(o.getProduct().getId());
             joinResponse1.setProductName(o.getProduct().getName());
-            joinResponse1.setOrderId((int) o.getProduct().getTax());
-            joinResponse1.setOrderId((int) o.getProduct().getPrice());
+            joinResponse1.setTax((int) o.getProduct().getTax());
+            joinResponse1.setPrice((int) o.getProduct().getPrice());
             System.out.println(joinResponse1);
             joinResponse.add(joinResponse1);
         }

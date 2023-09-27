@@ -48,7 +48,9 @@ public class Product {
         this.tax = tax;
         this.status = status;
     }
-
+    public Product(Customer customer){
+        this.customer=customer;
+    }
     public Product(String name, float price, float tax) {
         this.name = name;
         this.price = price;

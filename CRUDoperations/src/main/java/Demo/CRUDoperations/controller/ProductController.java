@@ -2,8 +2,8 @@ package Demo.CRUDoperations.controller;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.ProductRequest;
+import Demo.CRUDoperations.dto.response.Data;
 import Demo.CRUDoperations.service.ProductService;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -35,6 +36,13 @@ public class ProductController {
         InputStreamResource inputStreamResource=new InputStreamResource(data);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"attachement;filename=products.xlsx").contentType( MediaType.parseMediaType("application/vnd.ms-excel")).body(inputStreamResource);
         //new ApiResponse(HttpStatus.OK.value(), ,"File is downloaded",true);
+    }
+
+    @GetMapping("/getreport")
+    public  ResponseEntity<InputStreamResource> getReport() throws IOException{
+        ByteArrayInputStream data=productService.getReport();
+        InputStreamResource inputStreamResource=new InputStreamResource(data);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"attachement;filename=Report.xlsx").contentType( MediaType.parseMediaType("application/vnd.ms-excel")).body(inputStreamResource);
     }
 
     @GetMapping
@@ -65,10 +73,10 @@ public class ProductController {
         return productService.consumer(productRequest);
     }
 
-    @GetMapping(value = "orders/{id}")
+  /*  @GetMapping(value = "orders/{id}")
     public ApiResponse getOrdersByProduct(@PathVariable int id){
         return productService.getProductOrders(id);
-    }
+    }*/
 
 
     @GetMapping("/{offset}/{limit}")
@@ -85,5 +93,17 @@ public class ProductController {
     public  ApiResponse forEmailReport(@RequestParam String email){
         return productService.forEmailReport(email);
     }
+
+
+
+    @GetMapping("/fulldata/report")
+    public List<Data> completereport(){
+        return productService.complerereport();
+    }
+
+
+
+
+
 
 }

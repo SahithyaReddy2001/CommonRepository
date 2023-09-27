@@ -18,6 +18,7 @@ public class ProductRequest {
     public Float price;
     public Float tax;
     public Status status;
+    public Integer customerId;
 
 
 }

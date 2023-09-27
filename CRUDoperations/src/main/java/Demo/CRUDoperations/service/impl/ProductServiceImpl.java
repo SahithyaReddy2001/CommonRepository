@@ -2,9 +2,13 @@ package Demo.CRUDoperations.service.impl;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.ProductRequest;
+import Demo.CRUDoperations.dto.response.Data;
+import Demo.CRUDoperations.dto.response.GetOrders;
 import Demo.CRUDoperations.dto.response.ProductResponse;
+import Demo.CRUDoperations.entity.Customer;
 import Demo.CRUDoperations.entity.Product;
 import Demo.CRUDoperations.entity.Status;
+import Demo.CRUDoperations.repository.CustomerRepository;
 import Demo.CRUDoperations.repository.ProductRepository;
 import Demo.CRUDoperations.service.ProductService;
 import Demo.CRUDoperations.service.kafkaservice.ConsumerService;
@@ -40,6 +44,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    CustomerRepository customerRepository;
     @Autowired
     MailService mailService;
 
@@ -105,9 +111,44 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    public ByteArrayInputStream getReport() throws IOException{
+        XSSFWorkbook completeReport=new XSSFWorkbook();
+        XSSFSheet report=completeReport.createSheet("report");
+        Row headers=report.createRow(0);
+        headers.createCell(0).setCellValue("CustomerId");
+        headers.createCell(1).setCellValue("CustomerName");
+        headers.createCell(3).setCellValue("CustomerEmail");
+        headers.createCell(4).setCellValue("OrderId");
+        headers.createCell(5).setCellValue("AmountWithOutTax");
+        headers.createCell(6).setCellValue("TotalAmount");
+        headers.createCell(7).setCellValue("ProductId");
+        headers.createCell(8).setCellValue("ProductName");
+        headers.createCell(9).setCellValue("ProductPrice");
+        headers.createCell(10).setCellValue("ProductTax");
+        headers.createCell(11).setCellValue("ProductProviderId");
+        List<Data> totalData=productRepository.getByOrderItem();
+        for(int i=1;i<totalData.size();i++){
+            Row data1=report.createRow(i);
+            Data data=totalData.get(i-1);
+            data1.createCell(0).setCellValue(data.getCustomerId());
+            data1.createCell(1).setCellValue(data.getCustomerName());
+            data1.createCell(3).setCellValue(data.getCustomerMail());
+            data1.createCell(4).setCellValue(data.getOrderId());
+            data1.createCell(5).setCellValue(data.getAmountWithOutTax());
+            data1.createCell(6).setCellValue(data.getTotalAmount());
+            data1.createCell(7).setCellValue(data.getProductId());
+            data1.createCell(8).setCellValue(data.getProductName());
+            data1.createCell(9).setCellValue(data.getProductPrice());
+            data1.createCell(10).setCellValue(data.getProductTax());
+            data1.createCell(11).setCellValue(data.getProductProvider());
+        }
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        completeReport.write(data);
+        return new ByteArrayInputStream(data.toByteArray());
+    }
+
     public ApiResponse fileData(MultipartFile file) throws IOException {
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(file.getInputStream());
-        //xssfWorkbook.getName();
         XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
         Iterator<Row> rowIterator = xssfSheet.rowIterator();
         List<Product> products = new ArrayList<>();
@@ -177,7 +218,8 @@ public class ProductServiceImpl implements ProductService {
         if (!ObjectUtils.isEmpty(productRequest.getId())) {
             optionalProduct = Optional.of(getProductById(productRequest.id));
         }
-        Product product = optionalProduct.orElse(new Product());
+        Product product = optionalProduct.orElse(new Product(customerRepository.findById(productRequest.getCustomerId()).get()));
+        //Customer customer=productRepository.findById(productRequest.id).get().getCustomer();
         System.out.println(product);
         product.setName(productRequest.getName());
         product.setPrice(productRequest.getPrice());
@@ -220,11 +262,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    public ApiResponse getProductOrders(int id) {
+/*    public ApiResponse getProductOrders(int id) {
         ApiResponse apiResponse=new ApiResponse(HttpStatus.OK.value(), productRepository.getByProductId(id), "All product orders", true);
         System.out.println(apiResponse.getData());
         return apiResponse;
-    }
+    }*/
 
 
     public ApiResponse sortByName(String sort) {
@@ -244,6 +286,11 @@ public class ProductServiceImpl implements ProductService {
         if (!optionalProduct.isPresent())
             throw new NoSuchElementException("Inavlid product id");
         return optionalProduct.get();
+    }
+
+
+    public List<Data> complerereport(){
+        return productRepository.getByOrderItem();
     }
 
 }

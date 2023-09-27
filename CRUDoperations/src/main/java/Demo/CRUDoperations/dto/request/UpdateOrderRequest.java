@@ -8,6 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class UpdateOrderRequest {
-    public Integer order_id;
-    public Integer product_id;
+    public Integer orderId;
+    public int[] product_ids;
 }

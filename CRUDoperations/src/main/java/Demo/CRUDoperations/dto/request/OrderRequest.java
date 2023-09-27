@@ -1,5 +1,6 @@
 package Demo.CRUDoperations.dto.request;
 
+import Demo.CRUDoperations.entity.Customer;
 import Demo.CRUDoperations.entity.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,15 +17,15 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class OrderRequest {
     public Integer id;
-    public Integer productId;
+    public Customer customer;
 
 
     @NotNull(message = "Tax Amount is Mandatory")
     @Min(1)
-    public float taxAmount;
+    public Double taxAmount;
     @NotNull(message = "Non Tax Amount is Mandatory")
     @Min(1)
-    public float nonTaxAmount;
+    public Double nonTaxAmount;
 
     @Enumerated(EnumType.STRING)
     public Status status;

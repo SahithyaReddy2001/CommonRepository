@@ -1,16 +1,12 @@
 package Demo.CRUDoperations.controller;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
+import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
-import Demo.CRUDoperations.dto.response.OrderResponse;
-import Demo.CRUDoperations.entity.Orders;
-import Demo.CRUDoperations.entity.Status;
 import Demo.CRUDoperations.service.OrderService;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +22,9 @@ public class OrderController {
     @Autowired
     OrderService orderServiceImps;
 
-    @PostMapping("/{id}")
-    public void saveOrders(@PathVariable int id){
-        orderServiceImps.createOrders(id);
+    @PostMapping()
+    public void saveOrders(@RequestBody PostRequest postRequest){
+        orderServiceImps.createOrders(postRequest);
     }
 
     @GetMapping
@@ -41,10 +37,10 @@ public class OrderController {
         return orderServiceImps.getAllOrders(id);
     }
 
-    @GetMapping("{offset}/{pageSize}/{field}")
+    /*@GetMapping("{offset}/{pageSize}/{field}")
     public ApiResponse paginationAndSorting(@PathVariable int offset, @PathVariable int pageSize, @PathVariable String field){
         return orderServiceImps.findOrdersWIthPaginationAndSorting(offset,pageSize,field);
-    }
+    }*/
 
     @PutMapping
     public ApiResponse updateOrders(@Valid @RequestBody UpdateOrderRequest updateOrderRequest) {

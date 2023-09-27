@@ -1,6 +1,6 @@
 package Demo.CRUDoperations.download;
 
-import Demo.CRUDoperations.entity.Orders;
+import Demo.CRUDoperations.entity.Order;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -16,7 +16,7 @@ public class ExcelDownload {
     public static String OrderDetails[] = {"id", "productId", "taxAmount", "nonTaxAmount", "status"};
     public static String orderSheet = "orderDetails";
 
-    public static ByteArrayInputStream orderDownload(List<Orders> orders) throws IOException {
+    public static ByteArrayInputStream orderDownload(List<Order> orders) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
@@ -29,11 +29,11 @@ public class ExcelDownload {
             }
 
             int rowIndex = 1;
-            for (Orders o : orders) {
+            for (Order o : orders) {
                 Row row1 = sheet.createRow(rowIndex);
                 rowIndex++;
                 row1.createCell(0).setCellValue(o.getId());
-                row1.createCell(1).setCellValue(o.getProduct().getId());
+                //row1.createCell(1).setCellValue(o.getProduct().getId());
                 row1.createCell(2).setCellValue(o.getTaxAmount());
                 row1.createCell(3).setCellValue(o.getNonTaxAmount());
                 row1.createCell(4).setCellValue(String.valueOf(o.getStatus()));

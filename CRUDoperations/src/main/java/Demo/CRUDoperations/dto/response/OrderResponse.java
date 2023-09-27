@@ -1,8 +1,7 @@
 package Demo.CRUDoperations.dto.response;
 
 import Demo.CRUDoperations.dto.request.OrderRequest;
-import Demo.CRUDoperations.entity.Orders;
-import Demo.CRUDoperations.entity.Status;
+import Demo.CRUDoperations.entity.Order;
 
 public class OrderResponse extends OrderRequest {
     public OrderResponse(){
@@ -10,12 +9,12 @@ public class OrderResponse extends OrderRequest {
     }
 
     public ProductResponse productResponse;
-    public OrderResponse(Orders orders){
-        this.id = orders.getId();
-        this.productId= orders.getProduct().getId();
-        this.nonTaxAmount = orders.getNonTaxAmount();
-        this.taxAmount = orders.getTaxAmount();
-        this.status = orders.getStatus();
+    public OrderResponse(Order order){
+        this.id = order.getId();
+        this.customer= order.getCustomer();
+        this.nonTaxAmount = order.getNonTaxAmount();
+        this.taxAmount = order.getTaxAmount();
+        this.status = order.getStatus();
     }
 
 

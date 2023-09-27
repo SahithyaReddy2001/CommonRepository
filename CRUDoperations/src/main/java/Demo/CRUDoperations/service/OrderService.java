@@ -1,17 +1,19 @@
 package Demo.CRUDoperations.service;
 
 import Demo.CRUDoperations.apiresponse.ApiResponse;
+import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public interface OrderService {
     ApiResponse getOrders();
 
-    void createOrders(Integer id);
+    void createOrders(PostRequest postRequest);
 
     ApiResponse getAllOrders(int id);
 
@@ -23,7 +25,7 @@ public interface OrderService {
 
     void sendMail(String toEmail, String Subject, String body);
 
-    ApiResponse findOrdersWIthPaginationAndSorting(int offset,int pageSize,String field);
+    //ApiResponse findOrdersWIthPaginationAndSorting(int offset,int pageSize,String field);
 
 
 }

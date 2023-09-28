@@ -5,11 +5,13 @@ import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
 import Demo.CRUDoperations.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
@@ -18,13 +20,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
+@EnableCaching
 public class OrderController {
     @Autowired
     OrderService orderServiceImps;
 
     @PostMapping()
-    public void saveOrders(@RequestBody PostRequest postRequest){
-        orderServiceImps.createOrders(postRequest);
+    public ApiResponse saveOrders(@RequestBody PostRequest postRequest){
+        return orderServiceImps.createOrders(postRequest);
     }
 
     @GetMapping

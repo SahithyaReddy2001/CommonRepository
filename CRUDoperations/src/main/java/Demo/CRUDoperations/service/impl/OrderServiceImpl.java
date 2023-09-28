@@ -6,13 +6,13 @@ import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
 import Demo.CRUDoperations.dto.response.JoinResponse;
 import Demo.CRUDoperations.dto.response.OrderResponse;
+import Demo.CRUDoperations.elasticEntity.ElastcOrder;
 import Demo.CRUDoperations.entity.*;
-import Demo.CRUDoperations.repository.CustomerRepository;
-import Demo.CRUDoperations.repository.OrderItemRepository;
-import Demo.CRUDoperations.repository.OrdersRepository;
-import Demo.CRUDoperations.repository.ProductRepository;
+import Demo.CRUDoperations.repository.*;
 import Demo.CRUDoperations.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,6 +32,8 @@ import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    public static final String HASH_KEY = "orderDetails";
+
     @Autowired
     OrdersRepository ordersRepository;
 
@@ -47,6 +49,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     JavaMailSender mailSender;
 
+    @Autowired
+    ElasticRepository elasticRepository;
+
     //GET REQUEST
     public ApiResponse getOrders(){
         List<JoinResponse> joinResponse=ordersRepository.findByStatus();
@@ -54,7 +59,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     //GET REQUEST BY ID
+    @Cacheable(key="#id",value = "orderDetails")
     public ApiResponse getAllOrders(int id) {
+        System.out.println("Fetching from database");
         List<JoinResponse> joinResponse = ordersRepository.singleOrder(id);
         if(joinResponse != null){
             return new ApiResponse(HttpStatus.OK.value(),joinResponse,HttpStatus.OK.getReasonPhrase(),true);
@@ -84,20 +91,21 @@ public class OrderServiceImpl implements OrderService {
     }*/
 
     //DELETE REQUEST
+    @CacheEvict(key="#id",value = "orderDetails")
     public ApiResponse deleteOrders(int id) {
         ordersRepository.deleteById(id);
         return getAllOrders(id);
     }
 
     //POST REQUEST
-    @Autowired
+    /*@Autowired
     KafkaTemplate<String,PostRequest> kaftaTemplate;
 
     public void createOrders(PostRequest postRequest){
         kaftaTemplate.send("NewOrder",postRequest);
-    }
-    @KafkaListener(topics = "NewOrder",groupId = "CreateOrder")
-    public ApiResponse kafkaListener(PostRequest postRequest) {
+    }*/
+    //@KafkaListener(topics = "NewOrder",groupId = "CreateOrder")
+    public ApiResponse createOrders(PostRequest postRequest) {
         // SAVE CUSTOMER
         Customer customer = new Customer();
         customer.setName(postRequest.getName());
@@ -115,9 +123,13 @@ public class OrderServiceImpl implements OrderService {
         order = ordersRepository.save(order);
         for(Integer i: postRequest.getProductId()){
             Product product = productRepository.findById(i).get();
+            // SAVE ORDERITEM
             OrderItem orderItem = new OrderItem(order,product);
             orderItemRepository.save(orderItem);
         }
+        // SAVE IN ELASTIC SEARCH
+        ElastcOrder elastcOrder = new ElastcOrder(order.getId(),postRequest.productId,taxAmount,nonTaxAmount,Status.ACTIVE,customer,order.getCreatedDate(),order.getUpdatedDate());
+        elasticRepository.save(elastcOrder);
         sendMail("sahithyavadiyala@gmail.com","ORDER PLACED SUCCESFULLY", "Your order placed succesfully and order details are order id : "+order.getId()+", tax amount : "+order.getTaxAmount()+", non tax amount : "+order.getNonTaxAmount());
         return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(order),HttpStatus.CREATED.getReasonPhrase(),true);
     }

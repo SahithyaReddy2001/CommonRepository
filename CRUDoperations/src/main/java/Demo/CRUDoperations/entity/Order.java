@@ -1,6 +1,8 @@
 package Demo.CRUDoperations.entity;
 import io.swagger.models.auth.In;
 import lombok.*;
+
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
@@ -29,6 +31,21 @@ public class Order {
     @ManyToOne(targetEntity = Customer.class)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customer;
+
+    private Date createdDate;
+
+    private Date updatedDate;
+
+    @PrePersist
+    protected void onCreate() {
+        createdDate = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedDate = new Date();
+    }
+
 
     public Order(Integer id, Status status){
         this.id = id;

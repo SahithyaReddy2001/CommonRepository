@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderService {
     ApiResponse getOrders();
 
-    void createOrders(PostRequest postRequest);
+    ApiResponse createOrders(PostRequest postRequest);
 
     ApiResponse getAllOrders(int id);
 

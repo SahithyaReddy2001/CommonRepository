@@ -9,5 +9,5 @@ import lombok.*;
 @ToString
 public class UpdateOrderRequest {
     public Integer orderId;
-    public int[] product_ids;
+    public int[] productIds;
 }

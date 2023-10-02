@@ -1,7 +1,6 @@
 package Demo.CRUDoperations.elasticEntity;
 
 import Demo.CRUDoperations.entity.Customer;
-import Demo.CRUDoperations.entity.OrderItem;
 import Demo.CRUDoperations.entity.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,13 +9,12 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Document(indexName = "elasticorder")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ElastcOrder {
+public class ElasticOrder {
     @Id
     private Integer id;
     private int[] orderItem;

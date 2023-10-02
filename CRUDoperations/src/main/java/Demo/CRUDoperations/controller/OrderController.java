@@ -3,6 +3,8 @@ package Demo.CRUDoperations.controller;
 import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
+import Demo.CRUDoperations.elasticEntity.ElasticOrder;
+import Demo.CRUDoperations.entity.Order;
 import Demo.CRUDoperations.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
@@ -38,6 +40,11 @@ public class OrderController {
     @GetMapping("/{id}")
     public ApiResponse getOrder(@PathVariable int id) {
         return orderServiceImps.getAllOrders(id);
+    }
+
+    @GetMapping("/elastic/{category}")
+    public List<ElasticOrder> elasticOrders(@PathVariable String category){
+        return orderServiceImps.elasticOrders(category);
     }
 
     /*@GetMapping("{offset}/{pageSize}/{field}")

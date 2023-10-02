@@ -6,22 +6,31 @@ import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
 import Demo.CRUDoperations.dto.response.JoinResponse;
 import Demo.CRUDoperations.dto.response.OrderResponse;
-import Demo.CRUDoperations.elasticEntity.ElastcOrder;
+import Demo.CRUDoperations.elasticEntity.ElasticOrder;
 import Demo.CRUDoperations.entity.*;
 import Demo.CRUDoperations.repository.*;
 import Demo.CRUDoperations.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.SearchHit;
+
 
 
 import javax.transaction.Transactional;
@@ -29,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -52,11 +62,35 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     ElasticRepository elasticRepository;
 
+    @Autowired
+     ElasticsearchOperations elasticsearchOperations;
+
+
     //GET REQUEST
     public ApiResponse getOrders(){
         List<JoinResponse> joinResponse=ordersRepository.findByStatus();
         return new ApiResponse(HttpStatus.OK.value(),joinResponse,HttpStatus.OK.getReasonPhrase(),true);
     }
+
+    public List<ElasticOrder> elasticOrders(String category) {
+        QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
+        Query searchQuery = null;
+        if("id".equals(category)){
+            searchQuery = new NativeSearchQueryBuilder().withQuery(queryBuilder).withSort(SortBuilders.fieldSort("id").order(SortOrder.ASC)).build();
+        }
+        else if ("taxAmount".equals(category)){
+             searchQuery = new NativeSearchQueryBuilder().withQuery(queryBuilder).withSort(SortBuilders.fieldSort("taxAmount").order(SortOrder.ASC)).build();
+        }
+        else if ("nonTaxAmount".equals(category)){
+            searchQuery = new NativeSearchQueryBuilder().withQuery(queryBuilder).withSort(SortBuilders.fieldSort("nonTaxAmount").order(SortOrder.ASC)).build();
+        }
+        else if ("customerId".equals(category)){
+            searchQuery = new NativeSearchQueryBuilder().withQuery(queryBuilder).withSort(SortBuilders.fieldSort("customer.id").order(SortOrder.ASC)).build();
+        }
+        SearchHits<ElasticOrder> orderHits = elasticsearchOperations.search(searchQuery, ElasticOrder.class, IndexCoordinates.of("elasticorder"));
+        return orderHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
+    }
+
 
     //GET REQUEST BY ID
     @Cacheable(key="#id",value = "orderDetails")
@@ -70,6 +104,7 @@ public class OrderServiceImpl implements OrderService {
             return new ApiResponse(HttpStatus.BAD_REQUEST.value(),null,"order not exist in system with given id "+id, false);
         }
     }
+
 
     // PAGINATION AND SORTING
     /*public ApiResponse findOrdersWIthPaginationAndSorting(int offset, int pageSize, String field){
@@ -94,6 +129,7 @@ public class OrderServiceImpl implements OrderService {
     @CacheEvict(key="#id",value = "orderDetails")
     public ApiResponse deleteOrders(int id) {
         ordersRepository.deleteById(id);
+        elasticRepository.deleteById(id);
         return getAllOrders(id);
     }
 
@@ -107,10 +143,16 @@ public class OrderServiceImpl implements OrderService {
     //@KafkaListener(topics = "NewOrder",groupId = "CreateOrder")
     public ApiResponse createOrders(PostRequest postRequest) {
         // SAVE CUSTOMER
-        Customer customer = new Customer();
-        customer.setName(postRequest.getName());
-        customer.setEmail(postRequest.getEmail());
-        customerRepository.save(customer);
+        Customer customer = null;
+        if(customerRepository.findByEmail(postRequest.getEmail()) == null) {
+            customer = new Customer();
+            customer.setName(postRequest.getName());
+            customer.setEmail(postRequest.getEmail());
+            customerRepository.save(customer);
+        }
+        else{
+            customer = customerRepository.findByEmail(postRequest.getEmail());
+        }
         Double taxAmount = (double) 0;
         Double nonTaxAmount = (double) 0;
         for(Integer i: postRequest.getProductId()){
@@ -128,16 +170,15 @@ public class OrderServiceImpl implements OrderService {
             orderItemRepository.save(orderItem);
         }
         // SAVE IN ELASTIC SEARCH
-        ElastcOrder elastcOrder = new ElastcOrder(order.getId(),postRequest.productId,taxAmount,nonTaxAmount,Status.ACTIVE,customer,order.getCreatedDate(),order.getUpdatedDate());
-        elasticRepository.save(elastcOrder);
+        ElasticOrder elasticOrder = new ElasticOrder(order.getId(),postRequest.productId,taxAmount,nonTaxAmount,Status.ACTIVE,customer,order.getCreatedDate(),order.getUpdatedDate());
+        elasticRepository.save(elasticOrder);
         sendMail("sahithyavadiyala@gmail.com","ORDER PLACED SUCCESFULLY", "Your order placed succesfully and order details are order id : "+order.getId()+", tax amount : "+order.getTaxAmount()+", non tax amount : "+order.getNonTaxAmount());
         return new ApiResponse(HttpStatus.OK.value(),new OrderResponse(order),HttpStatus.CREATED.getReasonPhrase(),true);
     }
 
-
     //PUT REQUEST
     @Transactional
-   public ApiResponse updateOrders(UpdateOrderRequest updateOrderRequest) {
+    public ApiResponse updateOrders(UpdateOrderRequest updateOrderRequest) {
        Order order = ordersRepository.findById(updateOrderRequest.getOrderId()).get();
        if (order == null) {
            return new ApiResponse(HttpStatus.BAD_REQUEST.value(), null, "order not exist in system with given id " + updateOrderRequest.getOrderId(), false);
@@ -146,7 +187,7 @@ public class OrderServiceImpl implements OrderService {
            orderItemRepository.deleteByOrder(order);
            Double taxAmount = (double) 0;
            Double nonTaxAmount = (double) 0;
-           for(Integer i: updateOrderRequest.product_ids){
+           for(Integer i: updateOrderRequest.productIds){
                Product product = productRepository.findById(i).get();
                taxAmount += product.getTax();
                nonTaxAmount += product.getPrice();
@@ -154,11 +195,14 @@ public class OrderServiceImpl implements OrderService {
            order.setNonTaxAmount(nonTaxAmount);
            order.setTaxAmount(taxAmount);
            ordersRepository.save(order);
-           for(Integer i: updateOrderRequest.product_ids){
+           for(Integer i: updateOrderRequest.productIds){
                Product product = productRepository.findById(i).get();
                OrderItem orderItem = new OrderItem(order,product);
                orderItemRepository.save(orderItem);
            }
+           elasticRepository.deleteById(updateOrderRequest.getOrderId());
+           ElasticOrder elasticOrder = new ElasticOrder(updateOrderRequest.getOrderId(),updateOrderRequest.productIds,taxAmount,nonTaxAmount,Status.ACTIVE, customerRepository.findById(order.getCustomer().getId()).get(),order.getCreatedDate(),order.getUpdatedDate());
+           elasticRepository.save(elasticOrder);
            return new ApiResponse(HttpStatus.OK.value(), new OrderResponse(order), HttpStatus.CREATED.getReasonPhrase(), true);
        }
    }

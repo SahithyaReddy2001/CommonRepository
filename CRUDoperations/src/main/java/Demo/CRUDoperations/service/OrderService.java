@@ -3,6 +3,8 @@ package Demo.CRUDoperations.service;
 import Demo.CRUDoperations.apiresponse.ApiResponse;
 import Demo.CRUDoperations.dto.request.PostRequest;
 import Demo.CRUDoperations.dto.request.UpdateOrderRequest;
+import Demo.CRUDoperations.elasticEntity.ElasticOrder;
+import Demo.CRUDoperations.entity.Order;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -20,6 +22,8 @@ public interface OrderService {
     ApiResponse updateOrders(UpdateOrderRequest updateOrderRequest);
 
     ApiResponse deleteOrders(int id);
+
+    List<ElasticOrder> elasticOrders(String category);
 
     ByteArrayInputStream downloadOrders() throws IOException;
 
